@@ -1,0 +1,19 @@
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="word" value="{{ word }}">
+    <input type="submit" value="Search">
+</form>
+
+{% for meaning in meanings %}
+    {{ meaning }}
+{% endfor %}
+
+{% if related_word %}
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="word" value="{{ related_word }}">
+    Do You mean by <input type="submit" value="{{ related_word }}">
+</form>
+{% elif words == 'No Words' %}
+    There is no word in our database which you had searched for, you may check the spelling.
+{% endif %}

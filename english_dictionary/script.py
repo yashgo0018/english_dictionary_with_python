@@ -20,6 +20,10 @@ def main(word):
         return state, None
 
 
+def data_keys():
+    return data.keys()
+
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         defination = main(sys.argv[1])

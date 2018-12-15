@@ -1,19 +1,92 @@
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="word" value="{{ word }}">
-    <input type="submit" value="Search">
-</form>
-
-{% for meaning in meanings %}
-    {{ meaning }}
-{% endfor %}
-
-{% if related_word %}
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="word" value="{{ related_word }}">
-    Do You mean by <input type="submit" value="{{ related_word }}">
-</form>
-{% elif words == 'No Words' %}
-    There is no word in our database which you had searched for, you may check the spelling.
-{% endif %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <style>
+        .autocomplete {
+          /*the container must be positioned relative:*/
+          position: relative;
+          display: inline-block;
+        }
+        .autocomplete-items {
+          position: absolute;
+          border: 1px solid #d4d4d4;
+          border-bottom: none;
+          border-top: none;
+          z-index: 99;
+          /*position the autocomplete items to be the same width as the container:*/
+          top: 100%;
+          left: 0;
+          right: 0;
+        }
+        .autocomplete-items div {
+          padding: 10px;
+          cursor: pointer;
+          color: black;
+          background-color: #fff;
+          border-bottom: 1px solid #d4d4d4;
+        }
+        .autocomplete-items div:hover {
+          /*when hovering an item:*/
+          background-color: #e9e9e9;
+        }
+        .autocomplete-active {
+          /*when navigating through the items using the arrow keys:*/
+          background-color: DodgerBlue !important;
+          color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-info text-light">
+    <div class="jumbotron bg-dark m-0">
+        <center>
+            <h1 class="text-light m-4">English Dictionary</h1>
+            <form method="post" class="form-inline col-lg-6 col-md-12 m-4">
+                {% csrf_token %}
+                <input
+                        id="search_for_word"
+                        type="text"
+                        class="form-control col-md-8 col-sm-12"
+                        placeholder="Search for word..."
+                        name="word"
+                        value="{{ word }}">
+                <input type="submit" value="Search" class="btn btn-success col-md-4 col-sm-12" tabindex="-1">
+            </form>
+        </center>
+    </div>
+    {% if meanings %}
+    <div class="container mt-5 bg-warning p-5" style=" width: 100%;">
+        <h2>Results for {{ word }}</h2>
+        <ul>
+        {% for meaning in meanings %}
+            <li>{{ meaning }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% elif related_word %}
+    <div class="container text-center mt-5 p-5 bg-warning text-dark">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="word" value="{{ related_word }}">
+            Do You mean by "<input type="submit" style="text-decoration: underline; font-style: italic; font-weight: bold;" class="btn bg-transparent p-0 text-primary" value="{{ related_word }}">"
+        </form>
+    </div>
+    {% elif words == 'No Words' %}
+    <center class="bg-warning text-danger p-5" style="border-radius: 10px;">There is no word in our database which you had searched for, you may check the spelling.</center>
+    {% endif %}
+    <script src="{% static 'js/autocomplete.js' %}"></script>
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script>
+        $.get("/api/data_keys/", (data, status) => {
+            autocomplete(document.getElementById("search_for_word"), data);
+            console.log(data)
+        })
+    </script>
+</body>
+</html>
